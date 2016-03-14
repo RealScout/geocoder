@@ -38,6 +38,7 @@ module Geocoder
         :mapquest,
         :opencagedata,
         :ovi,
+        :pelias,
         :here,
         :baidu,
         :geocodio,
