@@ -36,6 +36,7 @@ module Geocoder
         :nominatim,
         :mapbox,
         :mapquest,
+        :mapzen,
         :opencagedata,
         :ovi,
         :pelias,

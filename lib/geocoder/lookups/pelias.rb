@@ -3,18 +3,17 @@ require 'geocoder/results/pelias'
 
 module Geocoder::Lookup
   class Pelias < Base
-    def initialize
-      @endpoint = configuration[:endpoint] || 'localhost'
-      super
-    end
-
     def name
       'Pelias'
     end
 
+    def endpoint
+      configuration[:endpoint] || 'localhost'
+    end
+
     def query_url(query)
       query_type = query.reverse_geocode? ? 'reverse' : 'search'
-      "#{protocol}://#{@endpoint}/v1/#{query_type}?" + url_query_string(query)
+      "#{protocol}://#{endpoint}/v1/#{query_type}?" + url_query_string(query)
     end
 
     def required_api_key_parts
@@ -24,9 +23,11 @@ module Geocoder::Lookup
     private
 
     def query_url_params(query)
-      super(query).merge(
-          :key => configuration.api_key
-      ).merge(super)
+      {
+        api_key: configuration.api_key,
+        text: query.text,
+        size: 1
+      }.merge(super(query))
     end
 
     def results(query)
