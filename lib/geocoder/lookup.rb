@@ -25,6 +25,7 @@ module Geocoder
       @street_services ||= [
         :dstk,
         :esri,
+        :esri_address_candidates,
         :google,
         :google_premier,
         :google_places_details,

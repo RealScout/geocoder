@@ -4,12 +4,11 @@ module Geocoder::Result
   class EsriAddressCandidates < Base
 
     def address
-      address_key = reverse_geocode? ? 'Address' : 'Match_addr'
-      attributes[address_key]
+      attributes['Match_addr']
     end
 
     def city
-      if !reverse_geocode? && is_city?
+      if is_city?
         place_name
       else
         attributes['City']
@@ -23,8 +22,7 @@ module Geocoder::Result
     alias_method :state, :state_code
 
     def country
-      country_key = reverse_geocode? ? 'CountryCode' : 'Country'
-      attributes[country_key]
+      attributes['Country']
     end
 
     alias_method :country_code, :country
@@ -34,16 +32,15 @@ module Geocoder::Result
     end
 
     def place_name
-      place_name_key = reverse_geocode? ? 'Address' : 'PlaceName'
-      attributes[place_name_key]
+      attributes['PlaceName']
     end
 
     def place_type
-      reverse_geocode? ? 'Address' : attributes['Addr_Type']
+      attributes['Addr_Type']
     end
 
     def score
-      reverse_geocode? ? nil : @data['score']
+      @data['score'].to_f
     end
 
     def coordinates
@@ -61,15 +58,15 @@ module Geocoder::Result
     private
 
     def attributes
-      reverse_geocode? ? @data['address'] : @data['extent'].merge(@data['attributes'])
+      @data['extent'].merge(@data['attributes'])
     end
 
     def geometry
-      reverse_geocode? ? @data['location'] : @data['location']
+      @data['location']
     end
 
     def reverse_geocode?
-      @data['candidates'].nil?
+      false
     end
 
     def is_city?
@@ -77,4 +74,3 @@ module Geocoder::Result
     end
   end
 end
-

@@ -15,19 +15,24 @@ module Geocoder::Lookup
         url_query_string(query)
     end
 
-    def self.get_token(client_id, client_secret, expiration=20160)
+    def set_token(expiration=20160)
+      # store token as instance variable
+      # token cleared on any api error
+      return @token if @token.present?
+
       response = Net::HTTP.post_form URI('https://www.arcgis.com/sharing/rest/oauth2/token'),
         f: 'json',
-        client_id: client_id,
-        client_secret: client_secret,
+        client_id: configuration.api_key[0],
+        client_secret: configuration.api_key[1],
         grant_type: 'client_credentials',
         expiration: expiration
 
       response = JSON.parse(response.body)
       if response['error'].present?
+        @token = nil
         raise RuntimeError "failed to obtain token: #{response['error'].fetch('error_description', 'unknown error')}"
       end
-      response['access_token']
+      @token = response['access_token']
     end
 
     private # ---------------------------------------------------------------
@@ -36,6 +41,7 @@ module Geocoder::Lookup
       return [] unless doc = fetch_data(query)
 
       if (doc['error'].present?)
+        @token = nil
         raise_error(Geocoder::Error, doc['error'])
       end
 
@@ -57,9 +63,15 @@ module Geocoder::Lookup
       else
         params[:Address] = query.sanitized_text
       end
-      params.merge(super)
+
+      params.merge!(super)
+
+      if params[:forStorage] == 'true' && params[:token].blank?
+        params[:token] = set_token
+      end
+
+      params
     end
 
   end
 end
-
