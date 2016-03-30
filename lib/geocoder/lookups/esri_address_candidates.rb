@@ -30,7 +30,7 @@ module Geocoder::Lookup
       response = JSON.parse(response.body)
       if response['error'].present?
         @token = nil
-        raise RuntimeError "failed to obtain token: #{response['error'].fetch('error_description', 'unknown error')}"
+        raise_error(Geocoder::InvalidApiKey, "failed to obtain token: #{response['error'].fetch('error_description', 'unknown error')}")
       end
       @token = response['access_token']
     end
