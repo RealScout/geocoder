@@ -55,7 +55,7 @@ module Geocoder::Lookup
 
     def query_url_params(query)
       params = {
-        :f => 'pjson',
+        :f => 'json',
         :outFields => '*'
       }
       if query.reverse_geocode?
